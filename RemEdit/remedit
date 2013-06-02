@@ -1,0 +1,61 @@
+#!/bin/bash
+#Edit files on your phone like editing local files
+#Copyright 2013 broodplank.net
+
+if [[ -e /usr/bin/gedit ]]; then
+   echo "Gedit found"
+else
+   sudo apt-get -yqq install gedit
+fi;
+
+DIR=${1%/*}
+FILE=${1##*/}
+
+if [[ -e mode ]]; then
+	rm -f mode
+fi;
+adb -d shell ls -l ${1} | awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/) \
+             *2^(8-i));if(k)printf("%0o ",k);print}' > mode
+
+if [[ -e modenew ]]; then
+	rm -f modenew
+fi;
+head -c 3 mode > modenew
+
+export FILEMODE=`cat modenew`;
+
+if [[ -e mode ]]; then
+	rm -f mode
+fi;
+if [[ -e modenew ]]; then
+	rm -f modenew
+fi;
+
+echo
+echo "Remote Path: '${DIR}'"
+echo "Remote File: '${FILE}'"
+echo "Remote Mode: '${FILEMODE}'"
+echo 
+
+cd ${PWD}
+if [[ -e $FILE ]]; then
+	rm -f $FILE
+fi;
+adb pull $1 $FILE
+gedit $FILE
+
+echo 
+echo "Press enter when you're done editing the file"
+read -p [enter]
+echo 
+
+adb remount
+adb push $FILE $1
+adb -d shell busybox chmod ${FILEMODE} ${1}
+
+echo
+echo "Pushed new version of: ${FILE} located in: ${DIR} with mode: ${FILEMODE}"
+
+if [[ -e $FILE ]]; then
+	rm -f $FILE
+fi;

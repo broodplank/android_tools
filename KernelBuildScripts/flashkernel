@@ -1,0 +1,62 @@
+#!/bin/bash
+
+
+ShowMenu () {
+clear
+echo "What version do you want to flash?"
+echo "WARNING: ARIESVE/ANCORA ONLY (mmcblk0p8)"
+echo " "
+echo " "
+echo "Please make your choice:"
+echo " "
+echo " [1] JellyBean v4.1.x"
+echo " [2] JellyBean v4.2.x"
+echo " "
+echo " [x] Exit"
+echo " "
+
+
+}
+
+while [ 1 ]
+do
+ShowMenu
+read CHOICE
+case "$CHOICE" in
+
+"1")
+clear
+echo "Flashing build/4.1.x/output/boot.img to phone"
+cd build
+echo "Pushing boot.img to sdcard..."
+./adb push 4.1.x/output/boot.img /sdcard/boot.img
+echo "Flashing boot.img to mmcblk0p8..."
+./adb shell dd if=/sdcard/boot.img of=/dev/block/mmcblk0p8
+echo "Rebooting Phone..."
+./adb reboot
+cd ..
+;;
+
+
+"2")
+clear
+echo "Flashing build/4.2.x/output/boot.img to phone"
+cd build
+echo "Pushing boot.img to sdcard..."
+./adb push 4.2.x/output/boot.img /sdcard/boot.img
+echo "Flashing boot.img to mmcblk0p8..."
+./adb shell dd if=/sdcard/boot.img of=/dev/block/mmcblk0p8
+echo "Rebooting Phone..."
+./adb reboot
+;;
+
+
+"x")
+exit
+;;
+
+
+esac
+
+done
+exit

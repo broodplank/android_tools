@@ -1,0 +1,73 @@
+#!/bin/bash
+
+clear
+echo " "
+echo "Building boot.img for 4.1.x"
+echo " "
+
+echo "Cleaning possible previous remains"
+rm -f build/4.1.x/zImage
+rm -f build/4.1.x/boot.img-ramdisk/lib/modules/dhd.ko
+rm -f build/4.1.x/boot.img-ramdisk/lib/modules/cifs.ko
+rm -f build/4.1.x/ramdisk.gz
+
+echo "Copying zImage and modules"
+cp arch/arm/boot/zImage build/4.1.x/zImage
+cp drivers/net/wireless/bcmdhd/dhd.ko build/4.1.x/boot.img-ramdisk/lib/modules/dhd.ko
+cp fs/cifs/cifs.ko build/4.1.x/boot.img-ramdisk/lib/modules/cifs.ko
+
+cd build/4.1.x
+
+echo "Packing ramdisk"
+../mkbootfs ./boot.img-ramdisk | gzip > ramdisk.gz
+echo "Packing boot.img"
+../mkbootimg --kernel zImage --ramdisk ramdisk.gz --cmdline "no_console_suspend=1 console=null androidboot.hardware=qcom androidboot.emmc=true hw=6" -o boot.img --base "0x00400000" --ramdiskaddr "0x01400000"
+
+echo "Cleaning left overs"
+rm -f zImage
+rm -f boot.img-ramdisk/lib/modules/dhd.ko
+rm -f boot.img-ramdisk/lib/modules/cifs.ko
+rm -f ramdisk.gz
+
+echo "Moving boot.img to build/4.1.x/output/boot.img"
+mv -f boot.img output/boot.img
+
+cd ../..
+
+echo " "
+echo "Building boot.img for 4.2.x"
+echo " "
+
+echo "Cleaning possible previous remains"
+rm -f build/4.2.x/zImage
+rm -f build/4.2.x/boot.img-ramdisk/lib/modules/dhd.ko
+rm -f build/4.2.x/boot.img-ramdisk/lib/modules/cifs.ko
+rm -f build/4.2.x/ramdisk.gz
+
+echo "Copying zImage and modules"
+cp arch/arm/boot/zImage build/4.2.x/zImage
+cp drivers/net/wireless/bcmdhd/dhd.ko build/4.2.x/boot.img-ramdisk/lib/modules/dhd.ko
+cp fs/cifs/cifs.ko build/4.2.x/boot.img-ramdisk/lib/modules/cifs.ko
+
+cd build/4.2.x
+
+echo "Packing ramdisk"
+../mkbootfs ./boot.img-ramdisk | gzip > ramdisk.gz
+echo "Packing boot.img"
+../mkbootimg --kernel zImage --ramdisk ramdisk.gz --cmdline "no_console_suspend=1 console=null androidboot.hardware=qcom androidboot.emmc=true hw=6" -o boot.img --base "0x00400000" --ramdiskaddr "0x01400000"
+
+echo "Cleaning left overs"
+rm -f zImage
+rm -f boot.img-ramdisk/lib/modules/dhd.ko
+rm -f boot.img-ramdisk/lib/modules/cifs.ko
+rm -f ramdisk.gz
+
+echo "Moving boot.img to build/4.2.x/output/boot.img"
+mv -f boot.img output/boot.img
+
+cd ..
+
+echo " "
+echo " "
+echo " "
+echo "boot.img created for JB v4.1.x and JB 4.2.x"

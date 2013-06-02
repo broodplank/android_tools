@@ -1,0 +1,23 @@
+#!/bin/bash
+clear
+echo " "
+echo "Setting Variables"
+echo " "
+export ARCH=arm
+export CROSS_COMPILE=arm-cortex_a8-linux-gnueabi-
+export PATH=$PATH:~/toolchains/linaro/bin/
+
+echo " "
+echo "Make clean..."
+echo " "
+make clean 
+
+echo " "
+echo "Make kernel..."
+echo " "
+make -j8
+
+echo " "
+echo "Done!"
+echo " "
+

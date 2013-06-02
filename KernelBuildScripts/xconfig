@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo " "
+echo "Setting Variables"
+export ARCH=arm
+
+echo " "
+echo "Checking for .config"
+if [ -e .config ]; then
+  echo " "
+  echo ".config found, launching xconfig"
+  make xconfig
+else
+  echo " "
+  echo ".config not found, running make ariesve_defconfig"
+  make ariesve_defconfig
+  make xconfig
+fi;
+
+
