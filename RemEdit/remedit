@@ -2,11 +2,7 @@
 #Edit files on your phone like editing local files
 #Copyright 2013 broodplank.net
 
-if [[ -e /usr/bin/gedit ]]; then
-   echo "Gedit found"
-else
-   sudo apt-get -yqq install gedit
-fi;
+#Revision 2
 
 DIR=${1%/*}
 FILE=${1##*/}
@@ -42,7 +38,7 @@ if [[ -e $FILE ]]; then
 	rm -f $FILE
 fi;
 adb pull $1 $FILE
-gedit $FILE
+xdg-open $FILE
 
 echo 
 echo "Press enter when you're done editing the file"
