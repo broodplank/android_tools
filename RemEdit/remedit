@@ -2,14 +2,33 @@
 #Edit files on your phone like editing local files
 #Copyright 2013 broodplank.net
 
-#Revision 2
+#Revision 3
 
-DIR=${1%/*}
-FILE=${1##*/}
+
+if [[ $1 = "" ]]; then
+	echo "usage: remedit [remote path]"
+	echo " example: remedit /system/build.prop"
+	exit
+else
+	DIR=${1%/*}
+	FILE=${1##*/}
+fi;
 
 if [[ -e mode ]]; then
 	rm -f mode
 fi;
+
+adb get-state > state
+export DEVICESTATE=`cat state`;
+rm -f state
+
+if [[ ${DEVICESTATE} != 'device' ]]; then
+	echo "Waiting for device..."
+	echo "Make sure debugging mode is enabled"
+	adb 'wait-for-device'
+	echo "Device found"
+fi;
+
 adb -d shell ls -l ${1} | awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/) \
              *2^(8-i));if(k)printf("%0o ",k);print}' > mode
 
