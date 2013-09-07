@@ -1,0 +1,25 @@
+#!/bin/bash
+#Interactively restore repositories inside your manifest without losing anything
+#For android developers
+#Copyright 2013 broodplank.net
+
+#Revision 1
+
+
+
+if [[ ( $1 = "" ) || ( $1 = "--help" ) || ( $1 = "-help" ) ]]; then
+	echo "usage: reporestore [path to folder]"
+	echo " example: reporestore frameworks/av"
+       	exit
+else
+	DIR=${1%/*}
+	FILE=${1##*/}
+
+        echo "Restoring: ${DIR}/${FILE}..."
+        if [ ! -d ${PWD}${DIR}/${FILE} ]; then
+		mkdir -p ${PWD}${DIR}/${FILE}
+	fi
+        mv -f /tmp/${DIR}/${FILE} ${PWD}/${DIR}/${FILE} 
+	echo "Done!"
+
+fi;

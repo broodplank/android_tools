@@ -1,0 +1,57 @@
+#!/bin/bash
+#Interactively replace repositories inside your manifest without losing anything
+#For android developers
+#Copyright 2013 broodplank.net
+
+#Revision 1
+
+
+if [[ ( $1 = "" ) || ( $1 = "--help" ) || ( $1 = "-help" ) ]]; then
+	echo "usage: reporeplace [local path] [rom] [branch] [param]"
+	echo " example: reporeplace frameworks/av cm cm-10.2 -f"
+       	exit
+else
+	DIR=${1%/*}
+	FILE=${1##*/}
+	if [ ! -e tempdir ]; then
+		rm -f tempdir
+	fi
+fi;
+
+if [ ${4} != "-f" ]; then
+	if [ -d ${DIR}/${FILE} ]; then
+	  echo
+	else
+	  echo "folder does not exist"
+	  exit
+	fi;   
+fi
+
+echo "Replacing: ${DIR}/${FILE} with ${DIR}/${FILE} of ${3} at branch ${4}"
+echo
+
+echo "Moving current folder to /tmp"
+mkdir -p /tmp/${DIR}/${FILE}
+mv -f ${PWD}/${DIR}/${FILE} /tmp/${DIR}/${FILE}
+
+if [[ ( $2 = "aosp" )  || ( $2 = "cm" ) ]]; then
+   if [ $3 = "" ]; then
+     echo "No branch has been chosen, choose a branch"
+     echo " for example: cm-10.2 or master"
+     exit
+   fi;
+   if [ $2 = "aosp" ]; then
+      echo "Downloading from Google Sources"
+      echo ${DIR}/${FILE} > tempdir
+      export READ=`cat tempdir`;
+      git clone https://android.googlesource.com/platform/${READ} -b ${3} ${DIR}/${FILE}
+   fi;
+    if [ $2 = "cm" ]; then
+      echo "Downloading from CyanogenMod Sources"
+      echo ${DIR}/${FILE} > tempdir
+      export SED=`sed -i 's|/|_|g' tempdir`;
+      export READ=`cat tempdir`;
+      git clone https://github.com/CyanogenMod/android_${READ} -b ${3} ${DIR}/${FILE}
+   fi;
+
+fi;

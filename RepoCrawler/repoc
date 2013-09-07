@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Repository Crawler AKA repoc
+# Created by broodplank1337
+# Copyright (C) 2013 broodplank.net
+
+if [[ -e ${PWD}/result ]]; then
+  rm -f ${PWD}/result
+fi;
+if [[ -e ${PWD}/urls ]]; then
+  rm -f ${PWD}/urls
+fi;
+if [[ -e ${PWD}/branch ]]; then
+  rm -f ${PWD}/branch
+fi;
+if [[ -e ${PWD}/download.sh ]]; then
+  rm -f ${PWD}/download.sh
+fi;
+if [[ -d ${PWD}/repoctemp ]]; then
+  rm -Rf ${PWD}/repoctemp
+fi;
+
+mkdir ${PWD}/repoctemp
+
+if [[ $1 != "make" ]]; then
+    echo "Repository Crawler v1.0 (repoc)"
+    echo "Created by broodplank" 
+    echo "www.broodplank.net"
+    echo
+    echo "repoc crawls all configs from git repos recursively"
+    echo "and will generate either a shell script or manifest" 
+    echo
+    echo "usage: repoc make [clone|sync]"
+    echo
+    echo " example: repoc make clone"
+    echo "  will create a shell script that downloads the repos"
+    echo
+    echo " example: repoc make sync"
+    echo "  will create a manifest for a repo project (default.xml)"
+    echo
+    exit
+else
+	TYPE=$2
+    if [[ $TYPE = "clone" ]]; then
+	    echo "Repository Crawler v1.0 (repoc)"
+	    echo
+	    echo "Crawling...  Please wait"
+	    echo "Type: Clone (making download.sh)"
+	    echo
+            echo "Finding Repositories"
+	    find . -name .git > ${PWD}/result
+	    cp -f result resultnew
+	    cp -f result resultnew1
+	    sed -i 's|.git|.git/config|g' ${PWD}/resultnew
+	    export READ=`cat ${PWD}/result`;
+	    	if [[ ${READ} = "" ]]; then
+			echo
+			echo "No repositories found. Aborting"
+			exit
+	    	fi;
+	    sed -i 's|.git|.git/refs/remotes/m|g' ${PWD}/resultnew1
+	    echo
+	    echo "Creating temporary folder structure in:"
+	    echo "'${PWD}/repoctemp'"
+	    echo "Copying git configs to dirs..."
+	    echo
+	    #find . -type d -name .git -exec mkdir -p repoctemp/{} \;
+	    xargs -a resultnew1 cp -R --parents -t repoctemp
+	    xargs -a resultnew cp --parents -t repoctemp
+
+
+ 	   # find . -name .git/refs/remotes/m > ${PWD}/resultbranch
+	   # sed -i 's|.git|.git/config|g' ${PWD}/result
+
+	    xargs -a result cat | grep projectname > projectnames
+	    sed -i 's|	projectname = ||g' ${PWD}/projectnames
+
+	    echo "#!/bin/bash" > ${PWD}/download.sh
+	    chmod 755 ${PWD}/download.sh
+	    xargs -a resultnew cat | grep url > download.sh
+	    xargs -a resultnew1 cat | grep url > test.sh
+	    sed -i 's|	url = |git clone |g' ${PWD}/download.sh
+	    sed -i 's|git clone https://gerrit.googlesource.com/git-repo||g' ${PWD}/download.sh
+	    #sed -i 's|[branch "| -b |g' ${PWD}/branch
+	    #sed -i 's|"]"||g' ${PWD}/branch
+	    echo
+	    echo "Crawled Repositories List:"
+	    echo
+	    cat result
+	    echo
+   fi;
+
+   if [[ $TYPE = "sync" ]]; then
+            echo "Sync"
+   fi;
+
+   if [[ $TYPE = "" ]]; then
+            echo "Please define a type (clone|sync)"
+   fi;
+
+fi;
+
+
